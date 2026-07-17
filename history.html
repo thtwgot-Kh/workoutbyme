@@ -18,7 +18,7 @@
       <span class="topbar__mark">BC</span>
       <div>
         <h1>ประวัติย้อนหลัง</h1>
-        <p>ข้อมูลโภชนาการรายวัน แยกตามมื้อ</p>
+        <p>ข้อมูลโภชนาการรายวัน แยกตามมื้อ — มุมมองนักโภชนาการ</p>
       </div>
     </div>
     <div class="topbar__actions">
@@ -27,9 +27,46 @@
     </div>
   </header>
 
-  <div id="historyList"></div>
+  <div class="filter-row" id="filterRow">
+    <button class="filter-btn" data-range="7" type="button">7 วันล่าสุด</button>
+    <button class="filter-btn is-active" data-range="30" type="button">30 วันล่าสุด</button>
+    <button class="filter-btn" data-range="all" type="button">ทั้งหมด</button>
+  </div>
+
+  <section class="kpi-row" id="kpiRow"></section>
+
+  <section class="panel">
+    <h2 class="chart-title">แคลอรี่รายวัน เทียบเป้าหมาย</h2>
+    <div class="chart-legend" id="trendLegend"></div>
+    <div class="chart-scroll">
+      <div class="chart-container" id="trendChart"></div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2 class="chart-title">สัดส่วนสารอาหารรายวัน (กรัม)</h2>
+    <div class="chart-legend">
+      <span class="legend-key"><span class="dot dot--protein"></span>โปรตีน</span>
+      <span class="legend-key"><span class="dot dot--fat"></span>ไขมัน</span>
+      <span class="legend-key"><span class="dot dot--carb"></span>คาร์บ</span>
+    </div>
+    <div class="chart-scroll">
+      <div class="chart-container" id="macroChart"></div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2 class="chart-title">รายวัน (คลิกเพื่อดูรายละเอียด)</h2>
+    <div id="dayList" class="day-list"></div>
+  </section>
 
 </div>
+
+<dialog id="dayModal" class="day-modal">
+  <div class="day-modal__inner" id="dayModalBody"></div>
+</dialog>
+
+<div class="tooltip" id="chartTooltip" hidden></div>
 
 <script src="assets/history.js"></script>
 </body>
