@@ -1,4 +1,7 @@
 const $ = (id) => document.getElementById(id);
+const MEALS = ["breakfast", "lunch", "dinner"];
+const MEAL_LABELS = { breakfast: "เช้า", lunch: "กลางวัน", dinner: "เย็น" };
+let activeMeal = "breakfast";
 
 // ---------- Gauges ----------
 const GAUGE_DEFS = [
@@ -15,14 +18,27 @@ GAUGE_DEFS.forEach((g) => {
   gaugesEl.appendChild(div);
 });
 
-// ---------- Food rows ----------
-const foodBody = $("foodBody");
-const MAX_ROWS = 15;
-let rowCount = 0;
+// ---------- Meal tabs ----------
+document.querySelectorAll(".meal-tab").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    activeMeal = btn.dataset.meal;
+    document.querySelectorAll(".meal-tab").forEach((b) => b.classList.toggle("is-active", b === btn));
+    document.querySelectorAll(".meal-panel").forEach((p) => {
+      p.hidden = p.dataset.mealPanel !== activeMeal;
+    });
+    const label = $("activeMealLabel");
+    if (label) label.textContent = MEAL_LABELS[activeMeal];
+  });
+});
 
-function addFoodRow() {
-  if (rowCount >= MAX_ROWS) return;
-  rowCount++;
+// ---------- Food rows (per meal) ----------
+const MAX_ROWS_PER_MEAL = 8;
+const rowCounts = { breakfast: 0, lunch: 0, dinner: 0 };
+
+function addFoodRow(meal) {
+  if (rowCounts[meal] >= MAX_ROWS_PER_MEAL) return;
+  rowCounts[meal]++;
+  const tbody = document.querySelector(`.foodBody[data-meal="${meal}"]`);
   const tr = document.createElement("tr");
   const sel = document.createElement("select");
   sel.className = "foodSelect";
@@ -46,13 +62,24 @@ function addFoodRow() {
   tdC.className = "num foodC";
 
   tr.append(tdSel, tdGrams, tdP, tdF, tdC);
-  foodBody.appendChild(tr);
+  tbody.appendChild(tr);
 
   sel.addEventListener("input", calc);
   tdGrams.querySelector("input").addEventListener("input", calc);
+  return tr;
 }
-for (let i = 0; i < 5; i++) addFoodRow();
-$("addRow").addEventListener("click", addFoodRow);
+
+MEALS.forEach((meal) => {
+  for (let i = 0; i < 3; i++) addFoodRow(meal);
+});
+
+document.querySelectorAll(".addRow").forEach((btn) => {
+  btn.addEventListener("click", () => addFoodRow(btn.dataset.meal));
+});
+
+document.querySelectorAll(".carbSource, .carbGrams").forEach((el) => {
+  el.addEventListener("input", calc);
+});
 
 // ---------- Online food search (USDA FoodData Central) ----------
 const usdaKeyInput = $("usdaKey");
@@ -141,12 +168,57 @@ function addCustomFood(name, p, f, c) {
     opt.textContent = name;
     sel.appendChild(opt);
   });
-  addFoodRow();
-  const selects = document.querySelectorAll(".foodSelect");
-  selects[selects.length - 1].value = idx;
+  const tr = addFoodRow(activeMeal);
+  if (tr) tr.querySelector(".foodSelect").value = idx;
   foodSearchInput.value = "";
   searchResultsEl.innerHTML = "";
   calc();
+}
+
+// ---------- Per-meal sums ----------
+function sumMealFoods(meal) {
+  let p = 0, f = 0, c = 0;
+  const tbody = document.querySelector(`.foodBody[data-meal="${meal}"]`);
+  tbody.querySelectorAll(".foodSelect").forEach((sel) => {
+    const row = sel.closest("tr");
+    const grams = row.querySelector(".foodGrams");
+    const food = FOODS[parseInt(sel.value)];
+    const g = parseFloat(grams.value) || 0;
+    const factor = g / 100;
+    const fp = food.p * factor, ff = food.f * factor, fc = food.c * factor;
+    p += fp; f += ff; c += fc;
+    row.querySelector(".foodP").textContent = fp.toFixed(1) + " ก.";
+    row.querySelector(".foodF").textContent = ff.toFixed(1) + " ก.";
+    row.querySelector(".foodC").textContent = fc.toFixed(1) + " ก.";
+  });
+  return { p, f, c };
+}
+
+function sumMealCarb(meal) {
+  const sel = document.querySelector(`.carbSource[data-meal="${meal}"]`);
+  const gramsInput = document.querySelector(`.carbGrams[data-meal="${meal}"]`);
+  const outEl = document.querySelector(`.carbCalOut[data-meal="${meal}"]`);
+  const carb = CARBS[parseInt(sel.value)];
+  const g = parseFloat(gramsInput.value) || 0;
+  const factor = g / 100;
+  const p = carb.p * factor, f = carb.f * factor, c = carb.c * factor;
+  const kcal = Math.round(p * 4 + f * 9 + c * 4);
+  outEl.textContent = kcal.toLocaleString() + " kcal";
+  return { p, f, c };
+}
+
+// ---------- Daily log (localStorage, shared with history.html) ----------
+function saveDailyLog(payload) {
+  const key = "bulkConsoleDailyLogs";
+  let logs = {};
+  try {
+    logs = JSON.parse(localStorage.getItem(key)) || {};
+  } catch (e) {
+    logs = {};
+  }
+  const dateKey = new Date().toLocaleDateString("en-CA");
+  logs[dateKey] = { date: dateKey, savedAt: new Date().toISOString(), ...payload };
+  localStorage.setItem(key, JSON.stringify(logs));
 }
 
 // ---------- Calculation ----------
@@ -177,36 +249,33 @@ function calc() {
   $("g_target").innerHTML = `${target.toLocaleString()} <small>kcal</small>`;
   $("g_gainday").innerHTML = `${gainPerDay.toFixed(3)} <small>กก.</small>`;
 
-  // food rows
+  // food + carbs, summed per meal
   let sumP = 0, sumF = 0, sumC = 0;
-  document.querySelectorAll(".foodSelect").forEach((sel, i) => {
-    const grams = document.querySelectorAll(".foodGrams")[i];
-    const f = FOODS[parseInt(sel.value)];
-    const g = parseFloat(grams.value) || 0;
-    const factor = g / 100;
-    const p = f.p * factor, fat = f.f * factor, c = f.c * factor;
-    sumP += p; sumF += fat; sumC += c;
-    const row = sel.closest("tr");
-    row.querySelector(".foodP").textContent = p.toFixed(1) + " ก.";
-    row.querySelector(".foodF").textContent = fat.toFixed(1) + " ก.";
-    row.querySelector(".foodC").textContent = c.toFixed(1) + " ก.";
+  const mealTotals = {};
+  MEALS.forEach((meal) => {
+    const foodSum = sumMealFoods(meal);
+    const carbSum = sumMealCarb(meal);
+    const mp = foodSum.p + carbSum.p;
+    const mf = foodSum.f + carbSum.f;
+    const mc = foodSum.c + carbSum.c;
+    const mkcal = Math.round(mp * 4 + mf * 9 + mc * 4);
+    mealTotals[meal] = { p: Math.round(mp), f: Math.round(mf), c: Math.round(mc), kcal: mkcal };
+    sumP += mp; sumF += mf; sumC += mc;
+
+    const subtotalEl = document.querySelector(`.meal-subtotal[data-meal-subtotal="${meal}"]`);
+    if (subtotalEl) {
+      subtotalEl.innerHTML = `รวมมื้อนี้: <b>${mkcal.toLocaleString()} kcal</b> · P ${mp.toFixed(1)} / F ${mf.toFixed(1)} / C ${mc.toFixed(1)} ก.`;
+    }
+    const mbEl = $(`mb_${meal}`);
+    if (mbEl) mbEl.textContent = mkcal.toLocaleString() + " kcal";
   });
 
-  // protein powder
+  // protein powder (whole day, not tied to a meal)
   const scoops = parseFloat($("scoops").value) || 0;
   const scoopProtein = parseFloat($("scoopProtein").value) || 0;
   const scoopCal = parseFloat($("scoopCal").value) || 0;
   sumP += scoops * scoopProtein;
   const scoopCalTotal = scoops * scoopCal;
-
-  // carbs
-  const carbSel = CARBS[parseInt($("carbSource").value)];
-  const carbGrams = parseFloat($("carbGrams").value) || 0;
-  const cf = carbGrams / 100;
-  const carbP = carbSel.p * cf, carbF = carbSel.f * cf, carbC = carbSel.c * cf;
-  sumP += carbP; sumF += carbF; sumC += carbC;
-  const carbCal = Math.round(carbP * 4 + carbF * 9 + carbC * 4);
-  $("carbCalOut").textContent = carbCal.toLocaleString() + " kcal";
 
   // calories = macros from real food (incl. scoop protein grams) minus the
   // calorie-equivalent of scoop protein (to avoid double counting), plus the
@@ -257,11 +326,18 @@ function calc() {
     pill.style.color = "var(--rust)";
     pill.style.borderColor = "var(--rust)";
   }
+
+  saveDailyLog({
+    target: { kcal: target, protein: targetProtein },
+    totals: { kcal: Math.round(finalCal), protein: Math.round(sumP), fat: Math.round(sumF), carb: Math.round(sumC) },
+    meals: mealTotals,
+    remain,
+  });
 }
 
 document
   .querySelectorAll(
-    "#gender,#age,#weight,#height,#activity,#rate,#proteinFactor,#scoops,#scoopProtein,#scoopCal,#carbSource,#carbGrams"
+    "#gender,#age,#weight,#height,#activity,#rate,#proteinFactor,#scoops,#scoopProtein,#scoopCal"
   )
   .forEach((el) => el.addEventListener("input", calc));
 

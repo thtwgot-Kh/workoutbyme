@@ -21,7 +21,10 @@
         <p>แผงควบคุมแคลอรี่ &amp; อัตราการเพิ่มน้ำหนัก</p>
       </div>
     </div>
-    <div class="topbar__status" id="statusPill">กำลังคำนวณ…</div>
+    <div class="topbar__actions">
+      <a class="btn" id="historyBtn" href="history.html" target="_blank" rel="noopener">📅 ประวัติย้อนหลัง</a>
+      <div class="topbar__status" id="statusPill">กำลังคำนวณ…</div>
+    </div>
   </header>
 
   <section class="gauges" id="gauges"></section>
@@ -79,15 +82,115 @@
 
     <!-- RIGHT COLUMN: food log -->
     <section class="panel panel--food">
-      <h2><span class="eyebrow">02</span> เนื้อสัตว์ที่กินจริง (น้ำหนักดิบ)</h2>
+      <h2><span class="eyebrow">02</span> อาหารที่กินจริง แยกตามมื้อ</h2>
 
-      <table class="food-table">
-        <thead>
-          <tr><th>ชนิด</th><th>กรัม</th><th>โปรตีน</th><th>ไขมัน</th><th>คาร์บ</th></tr>
-        </thead>
-        <tbody id="foodBody"></tbody>
-      </table>
-      <button class="btn" id="addRow" type="button">+ เพิ่มรายการ</button>
+      <div class="meal-tabs" id="mealTabs">
+        <button class="meal-tab is-active" data-meal="breakfast" type="button">เช้า</button>
+        <button class="meal-tab" data-meal="lunch" type="button">กลางวัน</button>
+        <button class="meal-tab" data-meal="dinner" type="button">เย็น</button>
+      </div>
+
+      <div class="meal-panel" data-meal-panel="breakfast">
+        <table class="food-table">
+          <thead>
+            <tr><th>ชนิด</th><th>กรัม</th><th>โปรตีน</th><th>ไขมัน</th><th>คาร์บ</th></tr>
+          </thead>
+          <tbody class="foodBody" data-meal="breakfast"></tbody>
+        </table>
+        <button class="btn addRow" data-meal="breakfast" type="button">+ เพิ่มรายการ</button>
+
+        <h3 class="meal-subhead">คาร์บมื้อนี้ (ต่อ 100 ก. สุก)</h3>
+        <div class="field-grid field-grid--3">
+          <div class="field">
+            <label>ชนิด</label>
+            <select class="carbSource" data-meal="breakfast">
+              <option value="0">ข้าวสวย</option>
+              <option value="1">ข้าวกล้อง</option>
+              <option value="2">เส้นก๋วยเตี๋ยว</option>
+              <option value="3">ขนมปังโฮลวีท</option>
+              <option value="4">มันฝรั่งต้ม</option>
+              <option value="5">ข้าวโอ๊ต (ดิบ)</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>น้ำหนัก (ก.)</label>
+            <input type="number" class="carbGrams" data-meal="breakfast" value="0" min="0">
+          </div>
+          <div class="field metric-mini">
+            <label>ให้พลังงาน</label>
+            <div class="metric-mini__value carbCalOut" data-meal="breakfast">0 kcal</div>
+          </div>
+        </div>
+        <p class="meal-subtotal" data-meal-subtotal="breakfast">รวมมื้อนี้: <b>0 kcal</b> · P 0 / F 0 / C 0 ก.</p>
+      </div>
+
+      <div class="meal-panel" data-meal-panel="lunch" hidden>
+        <table class="food-table">
+          <thead>
+            <tr><th>ชนิด</th><th>กรัม</th><th>โปรตีน</th><th>ไขมัน</th><th>คาร์บ</th></tr>
+          </thead>
+          <tbody class="foodBody" data-meal="lunch"></tbody>
+        </table>
+        <button class="btn addRow" data-meal="lunch" type="button">+ เพิ่มรายการ</button>
+
+        <h3 class="meal-subhead">คาร์บมื้อนี้ (ต่อ 100 ก. สุก)</h3>
+        <div class="field-grid field-grid--3">
+          <div class="field">
+            <label>ชนิด</label>
+            <select class="carbSource" data-meal="lunch">
+              <option value="0">ข้าวสวย</option>
+              <option value="1">ข้าวกล้อง</option>
+              <option value="2">เส้นก๋วยเตี๋ยว</option>
+              <option value="3">ขนมปังโฮลวีท</option>
+              <option value="4">มันฝรั่งต้ม</option>
+              <option value="5">ข้าวโอ๊ต (ดิบ)</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>น้ำหนัก (ก.)</label>
+            <input type="number" class="carbGrams" data-meal="lunch" value="0" min="0">
+          </div>
+          <div class="field metric-mini">
+            <label>ให้พลังงาน</label>
+            <div class="metric-mini__value carbCalOut" data-meal="lunch">0 kcal</div>
+          </div>
+        </div>
+        <p class="meal-subtotal" data-meal-subtotal="lunch">รวมมื้อนี้: <b>0 kcal</b> · P 0 / F 0 / C 0 ก.</p>
+      </div>
+
+      <div class="meal-panel" data-meal-panel="dinner" hidden>
+        <table class="food-table">
+          <thead>
+            <tr><th>ชนิด</th><th>กรัม</th><th>โปรตีน</th><th>ไขมัน</th><th>คาร์บ</th></tr>
+          </thead>
+          <tbody class="foodBody" data-meal="dinner"></tbody>
+        </table>
+        <button class="btn addRow" data-meal="dinner" type="button">+ เพิ่มรายการ</button>
+
+        <h3 class="meal-subhead">คาร์บมื้อนี้ (ต่อ 100 ก. สุก)</h3>
+        <div class="field-grid field-grid--3">
+          <div class="field">
+            <label>ชนิด</label>
+            <select class="carbSource" data-meal="dinner">
+              <option value="0">ข้าวสวย</option>
+              <option value="1">ข้าวกล้อง</option>
+              <option value="2">เส้นก๋วยเตี๋ยว</option>
+              <option value="3">ขนมปังโฮลวีท</option>
+              <option value="4">มันฝรั่งต้ม</option>
+              <option value="5">ข้าวโอ๊ต (ดิบ)</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>น้ำหนัก (ก.)</label>
+            <input type="number" class="carbGrams" data-meal="dinner" value="0" min="0">
+          </div>
+          <div class="field metric-mini">
+            <label>ให้พลังงาน</label>
+            <div class="metric-mini__value carbCalOut" data-meal="dinner">0 kcal</div>
+          </div>
+        </div>
+        <p class="meal-subtotal" data-meal-subtotal="dinner">รวมมื้อนี้: <b>0 kcal</b> · P 0 / F 0 / C 0 ก.</p>
+      </div>
 
       <h2 class="mt"><span class="eyebrow">02b</span> ค้นหาอาหารที่ไม่มีในลิสต์ (ออนไลน์)</h2>
       <div class="field">
@@ -98,11 +201,11 @@
       <div class="field">
         <label for="foodSearch">พิมพ์ชื่ออาหาร (ไทยหรืออังกฤษ)</label>
         <input type="text" id="foodSearch" placeholder="เช่น หมูสับ, ปลาหมึก, ไข่ต้ม...">
-        <p class="hint">ค้นแล้วกด "+ เพิ่ม" เพื่อดึงเข้าตารางด้านบนพร้อมกรอกกรัมได้เลย (ข้อมูลจาก USDA FoodData Central ต่อ 100 ก.)</p>
+        <p class="hint">ผลลัพธ์จะถูกเพิ่มเข้ามื้อที่เลือกอยู่ด้านบน (ตอนนี้: <b id="activeMealLabel">เช้า</b>) — ข้อมูลจาก USDA FoodData Central ต่อ 100 ก.</p>
       </div>
       <div id="searchResults" class="search-results"></div>
 
-      <h2 class="mt"><span class="eyebrow">03</span> เวย์โปรตีน / อาหารเสริม</h2>
+      <h2 class="mt"><span class="eyebrow">03</span> เวย์โปรตีน / อาหารเสริม <small class="dim">(รวมทั้งวัน ไม่ผูกกับมื้อใดมื้อหนึ่ง)</small></h2>
       <div class="field-grid field-grid--3">
         <div class="field">
           <label for="scoops">จำนวนสกู๊ป</label>
@@ -115,29 +218,6 @@
         <div class="field">
           <label for="scoopCal">แคลอรี่/สกู๊ป</label>
           <input type="number" id="scoopCal" value="120">
-        </div>
-      </div>
-
-      <h2 class="mt"><span class="eyebrow">04</span> คาร์บ / แหล่งพลังงานเสริม</h2>
-      <div class="field-grid field-grid--3">
-        <div class="field">
-          <label for="carbSource">ชนิด (ต่อ 100 ก. สุก)</label>
-          <select id="carbSource">
-            <option value="0">ข้าวสวย</option>
-            <option value="1">ข้าวกล้อง</option>
-            <option value="2">เส้นก๋วยเตี๋ยว</option>
-            <option value="3">ขนมปังโฮลวีท</option>
-            <option value="4">มันฝรั่งต้ม</option>
-            <option value="5">ข้าวโอ๊ต (ดิบ)</option>
-          </select>
-        </div>
-        <div class="field">
-          <label for="carbGrams">น้ำหนัก (ก.)</label>
-          <input type="number" id="carbGrams" value="0" min="0">
-        </div>
-        <div class="field metric-mini">
-          <label>ให้พลังงาน</label>
-          <div class="metric-mini__value" id="carbCalOut">0 kcal</div>
         </div>
       </div>
     </section>
@@ -167,6 +247,19 @@
         <div class="legend__row"><span>เป้าโปรตีน</span><b id="legTargetProtein">0 ก.</b></div>
         <div class="legend__row"><span>เป้าแคลอรี่/วัน</span><b id="legTargetCal">0 kcal</b></div>
         <div class="legend__row legend__row--highlight"><span>คงเหลือให้กินได้อีก</span><b id="legRemain">0 kcal</b></div>
+      </div>
+    </div>
+
+    <h3 class="meal-breakdown-title">แยกตามมื้อ</h3>
+    <div class="meal-breakdown" id="mealBreakdown">
+      <div class="meal-breakdown__row">
+        <span>เช้า</span><b id="mb_breakfast">0 kcal</b>
+      </div>
+      <div class="meal-breakdown__row">
+        <span>กลางวัน</span><b id="mb_lunch">0 kcal</b>
+      </div>
+      <div class="meal-breakdown__row">
+        <span>เย็น</span><b id="mb_dinner">0 kcal</b>
       </div>
     </div>
   </section>

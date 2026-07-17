@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bulk Console — ประวัติย้อนหลัง</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<div class="wrap">
+
+  <header class="topbar">
+    <div class="topbar__brand">
+      <span class="topbar__mark">BC</span>
+      <div>
+        <h1>ประวัติย้อนหลัง</h1>
+        <p>ข้อมูลโภชนาการรายวัน แยกตามมื้อ</p>
+      </div>
+    </div>
+    <div class="topbar__actions">
+      <a class="btn" href="index.html">← กลับไปหน้าแดชบอร์ด</a>
+      <button class="btn" id="clearAllBtn" type="button">ล้างประวัติทั้งหมด</button>
+    </div>
+  </header>
+
+  <div id="historyList"></div>
+
+</div>
+
+<script src="assets/history.js"></script>
+</body>
+</html>
