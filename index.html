@@ -89,6 +89,19 @@
       </table>
       <button class="btn" id="addRow" type="button">+ เพิ่มรายการ</button>
 
+      <h2 class="mt"><span class="eyebrow">02b</span> ค้นหาอาหารที่ไม่มีในลิสต์ (ออนไลน์)</h2>
+      <div class="field">
+        <label for="usdaKey">USDA API Key (ฟรี ใส่ครั้งเดียว เก็บไว้ในเบราว์เซอร์นี้เท่านั้น)</label>
+        <input type="text" id="usdaKey" placeholder="วางคีย์ที่ได้จากอีเมลตรงนี้">
+        <p class="hint">ยังไม่มีคีย์? <a href="https://fdc.nal.usda.gov/api-key-signup.html" target="_blank" rel="noopener">ขอฟรีที่นี่ (ใช้เวลา ~30 วิ)</a></p>
+      </div>
+      <div class="field">
+        <label for="foodSearch">พิมพ์ชื่ออาหาร (ไทยหรืออังกฤษ)</label>
+        <input type="text" id="foodSearch" placeholder="เช่น หมูสับ, ปลาหมึก, ไข่ต้ม...">
+        <p class="hint">ค้นแล้วกด "+ เพิ่ม" เพื่อดึงเข้าตารางด้านบนพร้อมกรอกกรัมได้เลย (ข้อมูลจาก USDA FoodData Central ต่อ 100 ก.)</p>
+      </div>
+      <div id="searchResults" class="search-results"></div>
+
       <h2 class="mt"><span class="eyebrow">03</span> เวย์โปรตีน / อาหารเสริม</h2>
       <div class="field-grid field-grid--3">
         <div class="field">

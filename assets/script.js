@@ -17,7 +17,7 @@ GAUGE_DEFS.forEach((g) => {
 
 // ---------- Food rows ----------
 const foodBody = $("foodBody");
-const MAX_ROWS = 8;
+const MAX_ROWS = 15;
 let rowCount = 0;
 
 function addFoodRow() {
@@ -53,6 +53,101 @@ function addFoodRow() {
 }
 for (let i = 0; i < 5; i++) addFoodRow();
 $("addRow").addEventListener("click", addFoodRow);
+
+// ---------- Online food search (USDA FoodData Central) ----------
+const usdaKeyInput = $("usdaKey");
+const foodSearchInput = $("foodSearch");
+const searchResultsEl = $("searchResults");
+
+usdaKeyInput.value = localStorage.getItem("usdaApiKey") || "";
+usdaKeyInput.addEventListener("input", () => {
+  localStorage.setItem("usdaApiKey", usdaKeyInput.value.trim());
+});
+
+function translateFoodQuery(q) {
+  for (const [th, en] of Object.entries(THAI_FOOD_TERMS)) {
+    if (q.includes(th)) return en;
+  }
+  return q;
+}
+
+function getUsdaNutrient(food, nutrientNames) {
+  const found = food.foodNutrients?.find((n) => nutrientNames.includes(n.nutrientName));
+  return found ? found.value : 0;
+}
+
+let searchDebounceId;
+foodSearchInput.addEventListener("input", () => {
+  clearTimeout(searchDebounceId);
+  const q = foodSearchInput.value.trim();
+  if (q.length < 2) {
+    searchResultsEl.innerHTML = "";
+    return;
+  }
+  searchDebounceId = setTimeout(() => runUsdaSearch(q), 450);
+});
+
+async function runUsdaSearch(q) {
+  const key = usdaKeyInput.value.trim();
+  if (!key) {
+    searchResultsEl.innerHTML = `<p class="hint">ใส่ USDA API Key ด้านบนก่อน (ขอฟรีได้ตามลิงก์)</p>`;
+    return;
+  }
+  searchResultsEl.innerHTML = `<p class="hint">กำลังค้นหา…</p>`;
+  const query = translateFoodQuery(q);
+  try {
+    const url = `https://api.nal.usda.gov/fdc/v1/foods/search?api_key=${encodeURIComponent(
+      key
+    )}&query=${encodeURIComponent(query)}&dataType=Foundation,SR%20Legacy&pageSize=8`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    const data = await res.json();
+    renderUsdaResults(data.foods || []);
+  } catch (err) {
+    searchResultsEl.innerHTML = `<p class="hint">ค้นหาไม่สำเร็จ (${err.message}) — เช็ค API key หรือลองพิมพ์เป็นภาษาอังกฤษดู</p>`;
+  }
+}
+
+function renderUsdaResults(foods) {
+  if (!foods.length) {
+    searchResultsEl.innerHTML = `<p class="hint">ไม่พบผลลัพธ์ ลองพิมพ์เป็นภาษาอังกฤษ เช่น "pork ground raw"</p>`;
+    return;
+  }
+  searchResultsEl.innerHTML = "";
+  foods.forEach((food) => {
+    const p = getUsdaNutrient(food, ["Protein"]);
+    const f = getUsdaNutrient(food, ["Total lipid (fat)"]);
+    const c = getUsdaNutrient(food, ["Carbohydrate, by difference"]);
+    const row = document.createElement("div");
+    row.className = "search-result";
+    row.innerHTML = `
+      <div class="search-result__info">
+        <div class="search-result__name">${food.description}</div>
+        <div class="search-result__macro">โปรตีน ${p.toFixed(1)} / ไขมัน ${f.toFixed(1)} / คาร์บ ${c.toFixed(1)} ก. ต่อ 100 ก.</div>
+      </div>
+      <button type="button" class="btn btn--small">+ เพิ่ม</button>
+    `;
+    row.querySelector("button").addEventListener("click", () => addCustomFood(food.description, p, f, c));
+    searchResultsEl.appendChild(row);
+  });
+}
+
+function addCustomFood(name, p, f, c) {
+  const idx = FOODS.length;
+  FOODS.push({ name, p, f, c });
+  document.querySelectorAll(".foodSelect").forEach((sel) => {
+    const opt = document.createElement("option");
+    opt.value = idx;
+    opt.textContent = name;
+    sel.appendChild(opt);
+  });
+  addFoodRow();
+  const selects = document.querySelectorAll(".foodSelect");
+  selects[selects.length - 1].value = idx;
+  foodSearchInput.value = "";
+  searchResultsEl.innerHTML = "";
+  calc();
+}
 
 // ---------- Calculation ----------
 function calc() {

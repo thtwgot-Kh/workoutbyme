@@ -195,6 +195,21 @@ output { color: var(--amber); font-family: var(--font-num); }
 }
 .btn:hover { border-color: var(--amber); color: var(--amber); }
 
+.search-results { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+.search-result {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: var(--panel-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 8px 12px;
+}
+.search-result__name { font-size: 13px; }
+.search-result__macro { font-family: var(--font-num); font-size: 11px; color: var(--text-dim); margin-top: 2px; }
+.btn--small { padding: 5px 10px; font-size: 12px; flex-shrink: 0; }
+
 .metric-mini__value {
   font-family: var(--font-num);
   font-size: 13px;
