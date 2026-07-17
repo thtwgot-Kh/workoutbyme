@@ -40,6 +40,9 @@ function addFoodRow(meal) {
   rowCounts[meal]++;
   const tbody = document.querySelector(`.foodBody[data-meal="${meal}"]`);
   const tr = document.createElement("tr");
+  tr.dataset.saved = "false";
+  tr.classList.add("row--unsaved");
+
   const sel = document.createElement("select");
   sel.className = "foodSelect";
   FOODS.forEach((f, idx) => {
@@ -53,6 +56,7 @@ function addFoodRow(meal) {
 
   const tdGrams = document.createElement("td");
   tdGrams.innerHTML = `<input type="number" class="foodGrams" value="0" min="0">`;
+  const gramsInput = tdGrams.querySelector("input");
 
   const tdP = document.createElement("td");
   tdP.className = "num foodP";
@@ -61,11 +65,31 @@ function addFoodRow(meal) {
   const tdC = document.createElement("td");
   tdC.className = "num foodC";
 
-  tr.append(tdSel, tdGrams, tdP, tdF, tdC);
+  const tdAction = document.createElement("td");
+  tdAction.className = "row-action";
+  const saveBtn = document.createElement("button");
+  saveBtn.type = "button";
+  saveBtn.className = "btn btn--small row-save";
+  saveBtn.textContent = "✓ บันทึก";
+  tdAction.appendChild(saveBtn);
+
+  tr.append(tdSel, tdGrams, tdP, tdF, tdC, tdAction);
   tbody.appendChild(tr);
 
   sel.addEventListener("input", calc);
-  tdGrams.querySelector("input").addEventListener("input", calc);
+  gramsInput.addEventListener("input", calc);
+
+  saveBtn.addEventListener("click", () => {
+    const isSaved = tr.dataset.saved === "true";
+    tr.dataset.saved = isSaved ? "false" : "true";
+    tr.classList.toggle("row--saved", !isSaved);
+    tr.classList.toggle("row--unsaved", isSaved);
+    sel.disabled = !isSaved;
+    gramsInput.disabled = !isSaved;
+    saveBtn.textContent = isSaved ? "✓ บันทึก" : "แก้ไข";
+    calc();
+  });
+
   return tr;
 }
 
@@ -179,17 +203,21 @@ function addCustomFood(name, p, f, c) {
 function sumMealFoods(meal) {
   let p = 0, f = 0, c = 0;
   const tbody = document.querySelector(`.foodBody[data-meal="${meal}"]`);
-  tbody.querySelectorAll(".foodSelect").forEach((sel) => {
-    const row = sel.closest("tr");
+  tbody.querySelectorAll("tr").forEach((row) => {
+    const sel = row.querySelector(".foodSelect");
     const grams = row.querySelector(".foodGrams");
     const food = FOODS[parseInt(sel.value)];
     const g = parseFloat(grams.value) || 0;
     const factor = g / 100;
     const fp = food.p * factor, ff = food.f * factor, fc = food.c * factor;
-    p += fp; f += ff; c += fc;
     row.querySelector(".foodP").textContent = fp.toFixed(1) + " ก.";
     row.querySelector(".foodF").textContent = ff.toFixed(1) + " ก.";
     row.querySelector(".foodC").textContent = fc.toFixed(1) + " ก.";
+    // only rows confirmed with "✓ บันทึก" count toward the meal/day totals —
+    // this is what keeps half-typed or unconfirmed entries out of the log
+    if (row.dataset.saved === "true") {
+      p += fp; f += ff; c += fc;
+    }
   });
   return { p, f, c };
 }

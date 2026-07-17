@@ -236,6 +236,17 @@ output { color: var(--amber); font-family: var(--font-num); }
   font-size: 12px;
 }
 .food-table td.num { font-family: var(--font-num); color: var(--text-dim); text-align: right; }
+.food-table td.row-action { white-space: nowrap; }
+.food-table select:disabled, .food-table input:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+.row--unsaved .foodP, .row--unsaved .foodF, .row--unsaved .foodC {
+  opacity: 0.55;
+  font-style: italic;
+}
+.row--saved { background: rgba(62, 142, 130, 0.08); }
+.row--saved .row-save { border-color: var(--teal); color: var(--teal); }
 
 .btn {
   margin-top: 10px;
