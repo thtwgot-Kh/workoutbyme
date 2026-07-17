@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bulk Console — แผงคุมแคลอรี่และน้ำหนัก</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<div class="wrap">
+
+  <header class="topbar">
+    <div class="topbar__brand">
+      <span class="topbar__mark">BC</span>
+      <div>
+        <h1>Bulk Console</h1>
+        <p>แผงควบคุมแคลอรี่ &amp; อัตราการเพิ่มน้ำหนัก</p>
+      </div>
+    </div>
+    <div class="topbar__status" id="statusPill">กำลังคำนวณ…</div>
+  </header>
+
+  <section class="gauges" id="gauges"></section>
+
+  <main class="grid">
+
+    <!-- LEFT COLUMN: profile + inputs -->
+    <section class="panel panel--profile">
+      <h2><span class="eyebrow">01</span> ข้อมูลตัวคุณ</h2>
+
+      <div class="field-grid">
+        <div class="field">
+          <label for="gender">เพศ</label>
+          <select id="gender">
+            <option value="male">ชาย</option>
+            <option value="female">หญิง</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="age">อายุ (ปี)</label>
+          <input type="number" id="age" value="30">
+        </div>
+        <div class="field">
+          <label for="weight">น้ำหนัก (กก.)</label>
+          <input type="number" id="weight" value="65" step="0.1">
+        </div>
+        <div class="field">
+          <label for="height">ส่วนสูง (ซม.)</label>
+          <input type="number" id="height" value="170">
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="activity">ระดับกิจกรรม</label>
+        <select id="activity">
+          <option value="1.2">น้อยมาก — นั่งทำงาน ไม่ออกกำลังกาย</option>
+          <option value="1.375">น้อย — ออกกำลังกาย 1-3 วัน/สัปดาห์</option>
+          <option value="1.55" selected>ปานกลาง — ออกกำลังกาย 3-5 วัน/สัปดาห์</option>
+          <option value="1.725">มาก — ออกกำลังกาย 6-7 วัน/สัปดาห์</option>
+          <option value="1.9">หนักมาก — เทรนหนัก + งานใช้แรง</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="rate">เป้าหมายเพิ่มน้ำหนัก (%/สัปดาห์) — <output id="rateOut">0.3</output>%</label>
+        <input type="range" id="rate" min="0.1" max="1" step="0.1" value="0.3">
+        <p class="hint">แนะนำ 0.25–0.5%/สัปดาห์ สำหรับ lean bulk เพื่อลดไขมันส่วนเกินที่พ่วงมา</p>
+      </div>
+
+      <div class="field">
+        <label for="proteinFactor">เป้าโปรตีน (กรัม ต่อ น้ำหนักตัว 1 กก.)</label>
+        <input type="number" id="proteinFactor" value="2" step="0.1" min="1" max="3">
+      </div>
+    </section>
+
+    <!-- RIGHT COLUMN: food log -->
+    <section class="panel panel--food">
+      <h2><span class="eyebrow">02</span> เนื้อสัตว์ที่กินจริง (น้ำหนักดิบ)</h2>
+
+      <table class="food-table">
+        <thead>
+          <tr><th>ชนิด</th><th>กรัม</th><th>โปรตีน</th><th>ไขมัน</th><th>คาร์บ</th></tr>
+        </thead>
+        <tbody id="foodBody"></tbody>
+      </table>
+      <button class="btn" id="addRow" type="button">+ เพิ่มรายการ</button>
+
+      <h2 class="mt"><span class="eyebrow">03</span> เวย์โปรตีน / อาหารเสริม</h2>
+      <div class="field-grid field-grid--3">
+        <div class="field">
+          <label for="scoops">จำนวนสกู๊ป</label>
+          <input type="number" id="scoops" value="0" min="0" step="1">
+        </div>
+        <div class="field">
+          <label for="scoopProtein">โปรตีน/สกู๊ป (ก.)</label>
+          <input type="number" id="scoopProtein" value="24">
+        </div>
+        <div class="field">
+          <label for="scoopCal">แคลอรี่/สกู๊ป</label>
+          <input type="number" id="scoopCal" value="120">
+        </div>
+      </div>
+
+      <h2 class="mt"><span class="eyebrow">04</span> คาร์บ / แหล่งพลังงานเสริม</h2>
+      <div class="field-grid field-grid--3">
+        <div class="field">
+          <label for="carbSource">ชนิด (ต่อ 100 ก. สุก)</label>
+          <select id="carbSource">
+            <option value="0">ข้าวสวย</option>
+            <option value="1">ข้าวกล้อง</option>
+            <option value="2">เส้นก๋วยเตี๋ยว</option>
+            <option value="3">ขนมปังโฮลวีท</option>
+            <option value="4">มันฝรั่งต้ม</option>
+            <option value="5">ข้าวโอ๊ต (ดิบ)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="carbGrams">น้ำหนัก (ก.)</label>
+          <input type="number" id="carbGrams" value="0" min="0">
+        </div>
+        <div class="field metric-mini">
+          <label>ให้พลังงาน</label>
+          <div class="metric-mini__value" id="carbCalOut">0 kcal</div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <section class="panel panel--summary">
+    <h2><span class="eyebrow">05</span> สรุปรวมวันนี้ เทียบเป้าหมาย</h2>
+    <div class="summary-grid">
+      <div class="donut-wrap">
+        <svg viewBox="0 0 120 120" id="donut" role="img" aria-label="สัดส่วนสารอาหาร">
+          <circle cx="60" cy="60" r="50" fill="none" stroke="var(--border)" stroke-width="14"/>
+          <circle cx="60" cy="60" r="50" fill="none" id="donutProtein" stroke-width="14" stroke-linecap="butt" transform="rotate(-90 60 60)"/>
+          <circle cx="60" cy="60" r="50" fill="none" id="donutFat" stroke-width="14" stroke-linecap="butt" transform="rotate(-90 60 60)"/>
+          <circle cx="60" cy="60" r="50" fill="none" id="donutCarb" stroke-width="14" stroke-linecap="butt" transform="rotate(-90 60 60)"/>
+        </svg>
+        <div class="donut-center">
+          <span id="donutKcal">0</span>
+          <small>kcal วันนี้</small>
+        </div>
+      </div>
+      <div class="legend">
+        <div class="legend__row"><span class="dot dot--protein"></span>โปรตีน <b id="legProtein">0 ก.</b></div>
+        <div class="legend__row"><span class="dot dot--fat"></span>ไขมัน <b id="legFat">0 ก.</b></div>
+        <div class="legend__row"><span class="dot dot--carb"></span>คาร์บ <b id="legCarb">0 ก.</b></div>
+        <div class="legend__row legend__row--divider"></div>
+        <div class="legend__row"><span>เป้าโปรตีน</span><b id="legTargetProtein">0 ก.</b></div>
+        <div class="legend__row"><span>เป้าแคลอรี่/วัน</span><b id="legTargetCal">0 kcal</b></div>
+        <div class="legend__row legend__row--highlight"><span>คงเหลือให้กินได้อีก</span><b id="legRemain">0 kcal</b></div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <p>Bulk Console · คำนวณด้วยสูตร Mifflin-St Jeor · ค่าพลังงาน 1 กก. น้ำหนักตัว ≈ 7,700 kcal (ค่าประมาณ ไม่ใช่คำแนะนำทางการแพทย์)</p>
+  </footer>
+
+</div>
+
+<script src="assets/data.js"></script>
+<script src="assets/script.js"></script>
+</body>
+</html>

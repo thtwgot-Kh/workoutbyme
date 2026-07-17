@@ -1,0 +1,258 @@
+:root {
+  --bg: #171B21;
+  --panel: #1E232B;
+  --panel-raised: #242A33;
+  --border: #323A46;
+  --text: #E7E9EC;
+  --text-dim: #8B93A1;
+  --amber: #C98A3E;
+  --amber-dim: #7A552A;
+  --teal: #3E8E82;
+  --rust: #B4544A;
+  --font-ui: 'Inter', sans-serif;
+  --font-num: 'JetBrains Mono', monospace;
+  --radius: 3px;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-ui);
+  line-height: 1.5;
+}
+
+.wrap {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 4rem;
+}
+
+/* ---------- Topbar ---------- */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.75rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+.topbar__brand { display: flex; align-items: center; gap: 12px; }
+.topbar__mark {
+  font-family: var(--font-num);
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--bg);
+  background: var(--amber);
+  padding: 8px 10px;
+  border-radius: var(--radius);
+  letter-spacing: 0.05em;
+}
+.topbar h1 { font-size: 20px; font-weight: 600; margin: 0; }
+.topbar p { font-size: 13px; color: var(--text-dim); margin: 2px 0 0; }
+.topbar__status {
+  font-family: var(--font-num);
+  font-size: 12px;
+  color: var(--teal);
+  border: 1px solid var(--teal);
+  border-radius: 999px;
+  padding: 5px 14px;
+  letter-spacing: 0.03em;
+}
+
+/* ---------- Gauges ---------- */
+.gauges {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 1.75rem;
+}
+.gauge {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem;
+}
+.gauge__label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-dim);
+  margin-bottom: 6px;
+}
+.gauge__value {
+  font-family: var(--font-num);
+  font-size: 22px;
+  font-weight: 500;
+  color: var(--amber);
+}
+.gauge__value small {
+  font-size: 12px;
+  color: var(--text-dim);
+  font-weight: 400;
+  margin-left: 4px;
+}
+
+/* ---------- Panels ---------- */
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1.3fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.25rem 1.5rem 1.5rem;
+}
+.panel h2 {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0 0 1rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.panel h2.mt { margin-top: 1.75rem; }
+.eyebrow {
+  font-family: var(--font-num);
+  font-size: 11px;
+  color: var(--amber);
+  border: 1px solid var(--amber-dim);
+  border-radius: var(--radius);
+  padding: 1px 6px;
+}
+
+/* ---------- Fields ---------- */
+.field { margin-bottom: 1rem; }
+.field label {
+  display: block;
+  font-size: 12px;
+  color: var(--text-dim);
+  margin-bottom: 5px;
+}
+.field-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.field-grid--3 { grid-template-columns: 1fr 1fr 1fr; }
+.hint { font-size: 11px; color: var(--text-dim); margin: 6px 0 0; }
+
+input[type="number"], input[type="text"], select {
+  width: 100%;
+  background: var(--panel-raised);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: var(--font-num);
+  font-size: 13px;
+  padding: 8px 10px;
+  border-radius: var(--radius);
+}
+select { font-family: var(--font-ui); }
+input:focus, select:focus {
+  outline: none;
+  border-color: var(--amber);
+}
+input[type="range"] {
+  width: 100%;
+  accent-color: var(--amber);
+}
+output { color: var(--amber); font-family: var(--font-num); }
+
+/* ---------- Food table ---------- */
+.food-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.food-table th {
+  text-align: left;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-dim);
+  font-weight: 500;
+  padding: 6px 4px;
+  border-bottom: 1px solid var(--border);
+}
+.food-table td { padding: 6px 4px; border-bottom: 1px solid var(--border); }
+.food-table td select, .food-table td input {
+  padding: 6px 8px;
+  font-size: 12px;
+}
+.food-table td.num { font-family: var(--font-num); color: var(--text-dim); text-align: right; }
+
+.btn {
+  margin-top: 10px;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-size: 13px;
+  padding: 7px 14px;
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+.btn:hover { border-color: var(--amber); color: var(--amber); }
+
+.metric-mini__value {
+  font-family: var(--font-num);
+  font-size: 13px;
+  color: var(--teal);
+  padding: 8px 0;
+}
+
+/* ---------- Summary / donut ---------- */
+.panel--summary { grid-column: 1 / -1; }
+.summary-grid {
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  gap: 2rem;
+  align-items: center;
+}
+.donut-wrap { position: relative; width: 120px; height: 120px; }
+.donut-wrap svg circle { transition: stroke-dasharray 0.2s ease; }
+.donut-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.donut-center span {
+  font-family: var(--font-num);
+  font-size: 20px;
+  font-weight: 500;
+}
+.donut-center small { font-size: 10px; color: var(--text-dim); }
+
+.legend__row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border);
+}
+.legend__row b { font-family: var(--font-num); font-weight: 500; }
+.legend__row--divider { border-bottom: none; padding: 2px 0; }
+.legend__row--highlight { color: var(--amber); }
+.legend__row--highlight b { color: var(--amber); }
+
+.dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 8px; }
+.dot--protein { background: var(--amber); }
+.dot--fat { background: var(--rust); }
+.dot--carb { background: var(--teal); }
+
+.foot {
+  margin-top: 2rem;
+  font-size: 11px;
+  color: var(--text-dim);
+  text-align: center;
+}
+
+@media (max-width: 720px) {
+  .gauges { grid-template-columns: repeat(2, 1fr); }
+  .grid { grid-template-columns: 1fr; }
+  .summary-grid { grid-template-columns: 1fr; justify-items: center; }
+}
